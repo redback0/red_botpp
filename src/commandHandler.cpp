@@ -3,6 +3,7 @@
 #include <map>
 #include <dpp/dpp.h>
 #include "main.h"
+#include "command.h"
 
 std::map<std::string, command_func_ptr> g_command;
 
@@ -27,7 +28,27 @@ void registerCommands(dpp::cluster& bot)
     ADD_COMMAND("repeat", "Repeat a message", commandRepeat,
         .add_option(dpp::command_option(
             dpp::command_option_type::co_string,
-            "text", "String to repeat", true))
+            "text", "String to repeat", true
+        ))
+    );
+    ADD_COMMAND("eco", "A set of economy commands", commandEco,
+        .add_option(
+            dpp::command_option(
+                dpp::command_option_type::co_sub_command,
+                "daily", "Free points, daily", false
+            )
+        )
+        .add_option(
+            dpp::command_option(
+                dpp::command_option_type::co_sub_command,
+                "balance", "Check your account balance", false
+            ).add_option(
+                dpp::command_option(
+                    dpp::command_option_type::co_user,
+                    "user", "User who's balance to check", false
+                )
+            )
+        )
     );
 }
 

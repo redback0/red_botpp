@@ -17,12 +17,9 @@ class Command : public dpp::slashcommand
     command_func_ptr    Execute;
 };
 
-void registerCommands(dpp::cluster& bot);
-
-void commandHandler(dpp::cluster& bot, const dpp::slashcommand_t& event);
-
 void commandNotFound(dpp::cluster& bot, const dpp::slashcommand_t& event);
 
 void commandPing(dpp::cluster& bot, const dpp::slashcommand_t& event);
 void commandTest(dpp::cluster& bot, const dpp::slashcommand_t& event);
 void commandRepeat(dpp::cluster& bot, const dpp::slashcommand_t& event);
+void commandEco(dpp::cluster& bot, const dpp::slashcommand_t& event);

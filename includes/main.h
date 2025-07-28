@@ -6,4 +6,7 @@
 #include <string>
 #include <map>
 #include <dpp/dpp.h>
-#include "command.h"
+
+void registerCommands(dpp::cluster& bot);
+
+void commandHandler(dpp::cluster& bot, const dpp::slashcommand_t& event);

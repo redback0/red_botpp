@@ -1,7 +1,6 @@
 
 // #include "main.h"
-#include <dpp/cluster.h>
-#include <dpp/dispatcher.h>
+#include <dpp/dpp.h>
 
 void commandPing(dpp::cluster& bot, const dpp::slashcommand_t& event)
 {
