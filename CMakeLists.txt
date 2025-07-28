@@ -9,6 +9,7 @@ add_executable(${PROJECT_NAME}
     src/commands/commandTest.cpp
     src/commands/commandRepeat.cpp
     src/commands/commandPing.cpp
+    src/commands/commandEco.cpp
 )
 
 find_package(DPP REQUIRED)

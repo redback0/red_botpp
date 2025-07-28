@@ -1,5 +1,5 @@
 
-#include "main.h"
+#include <dpp/dpp.h>
 
 void commandRepeat(dpp::cluster& bot, const dpp::slashcommand_t& event)
 {

@@ -15,7 +15,7 @@ Commands from original red_bot
   [ ] steal
   [ ] deposit
   [ ] inventory
-  [ ] top
+  [ ] top -- rename to leaderboard
   [ ] give
   [ ] withdraw
   [ ] shop
@@ -30,4 +30,5 @@ Commands from original red_bot
 # New features
 
 [ ] slash commands for all commands
+[ ] guild user data as database
 [ ] voice listening features :]
