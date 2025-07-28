@@ -1,20 +1,47 @@
+
+#include <string>
+#include <map>
+#include <dpp/dpp.h>
 #include "main.h"
 
-typedef void (*command_func)(dpp::cluster&, const dpp::slashcommand_t&);
+std::map<std::string, command_func_ptr> g_command;
 
-std::map<std::string, command_func> g_command{
-    {"ping", commandPing}
-};
+void registerCommands(dpp::cluster& bot)
+{
+    // g_command["ping"] = commandPing;
+    // g_command["test"] = commandTest;
+    // g_command["repeat"] = commandRepeat;
 
+    // bot.global_bulk_command_create({
+    //     dpp::slashcommand("ping", "Ping pong!", bot.me.id),
+    //     dpp::slashcommand("test", "This is a test", bot.me.id),
+    //     dpp::slashcommand("repeat", "Repeat a message", bot.me.id)
+    //         .add_option(dpp::command_option(
+    //             dpp::command_option_type::co_string,
+    //             "text", "String to repeat", true
+    //         ))
+    // });
+
+    ADD_COMMAND("ping", "Ping pong!", commandPing,);
+    ADD_COMMAND("test", "This is a test", commandTest,);
+    ADD_COMMAND("repeat", "Repeat a message", commandRepeat,
+        .add_option(dpp::command_option(
+            dpp::command_option_type::co_string,
+            "text", "String to repeat", true))
+    );
+}
 
 void commandHandler(dpp::cluster& bot, const dpp::slashcommand_t& event)
 {
-    auto command = g_command[event.command.get_command_name()];
+    auto command = g_command.at(event.command.get_command_name());
     if (command)
         command(bot, event);
+    else
+        std::cout << "Unable to find command"
+            << event.command.get_command_name() << std::endl;
 }
 
-void commandPing(dpp::cluster& bot, const dpp::slashcommand_t& event)
+void commandNotFound(dpp::cluster& bot, const dpp::slashcommand_t& event)
 {
-    event.reply("Pong!");
+    // purposely empty
 }
