@@ -43,9 +43,7 @@ int main(int ac, char** av)
     {
         if (dpp::run_once<struct register_bot_commands>())
         {
-            bot.global_command_create(
-                dpp::slashcommand("ping", "Ping pong!", bot.me.id)
-            );
+            registerCommands(bot);
         }
     });
 

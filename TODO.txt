@@ -1,12 +1,12 @@
-# red_bot features
+# old red_bot features
 
 [x] respond to "yo wuddup" with "yo wuddup" mhm
 [ ] reaction roles
 
 Commands from original red_bot
 
-[ ] test
-[ ] repeat
+[x] test
+[x] repeat
 [ ] cringe
 [ ] server
 [ ] eco
