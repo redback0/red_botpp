@@ -6,6 +6,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 add_executable(${PROJECT_NAME}
     src/main.cpp
     src/commandHandler.cpp
+    src/BotDatabase.cpp
     src/commands/commandTest.cpp
     src/commands/commandRepeat.cpp
     src/commands/commandPing.cpp
@@ -13,9 +14,11 @@ add_executable(${PROJECT_NAME}
 )
 
 find_package(DPP REQUIRED)
+find_package(SQLite3 REQUIRED)
 
 target_link_libraries(${PROJECT_NAME}
     ${DPP_LIBRARIES}
+    SQLite::SQLite3
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE
