@@ -10,7 +10,7 @@ Commands from original red_bot
 [ ] cringe
 [ ] server
 [ ] eco
-  [ ] daily
+  [x] daily
   [ ] balance
   [ ] steal
   [ ] deposit

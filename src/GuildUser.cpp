@@ -2,12 +2,15 @@
 #include "GuildUser.hpp"
 #include "botDatabase.h"
 #include <algorithm>
+#include <chrono>
 #include <exception>
 #include <iostream>
 #include <mutex>
 #include <stdexcept>
 #include <unistd.h>
 #include <random>
+
+using namespace std::literals;
 
 extern sqlite3* db;
 
@@ -71,13 +74,15 @@ GuildUser::GuildUser(std::string guild_id, std::string user_id)
         _is_new_user = false;
         _wallet = sqlite3_column_int64(read_stmt, 2);
         _bank = sqlite3_column_int64(read_stmt, 3);
-        // last_daily, last_steal
+        _last_daily = gu_time_t(sqlite3_column_int(read_stmt, 4));
+        _last_steal = gu_time_t(sqlite3_column_int(read_stmt, 5));
     break;
     case SQLITE_DONE:
         _is_new_user = true;
         _wallet = DEFAULT_WALLET;
         _bank = DEFAULT_BANK;
-        // last_daily, last_steal
+        _last_daily = DEFAULT_LAST_DAILY;
+        _last_steal = DEFUALT_LAST_STEAL;
     break;
     }
     while (sqlite3_step(read_stmt) != SQLITE_DONE)
@@ -98,10 +103,25 @@ sqlite3_int64 GuildUser::getBank() const
 
 bool GuildUser::doDaily()
 {
-    // check date :/
+    gu_tp_t now;
+    gu_tp_t last;
 
-    _wallet += DAILY_AMOUNT;
-    return true;
+    now = std::chrono::system_clock::now();
+    last = gu_tp_t(_last_daily);
+
+    last += 24h;
+
+    if (last < now)
+    {
+        _last_daily = std::chrono::duration_cast<gu_time_t>(
+            now.time_since_epoch());
+        _wallet += DAILY_AMOUNT;
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 GuildUser::StealResult GuildUser::doSteal(GuildUser& victim)
@@ -198,8 +218,8 @@ void GuildUser::saveChanges()
     QuickBindParam(write_stmt, "$user_id", _user_id);
     QuickBindParam(write_stmt, "$wallet", _wallet);
     QuickBindParam(write_stmt, "$bank", _wallet);
-    // QuickBindParam(write_stmt, "$last_daily", _last_daily);
-    // QuickBindParam(write_stmt, "$last_steal", _last_steal);
+    QuickBindParam(write_stmt, "$last_daily", _last_daily.count());
+    QuickBindParam(write_stmt, "$last_steal", _last_steal.count());
 
     err = sqlite3_step(write_stmt);
 }
