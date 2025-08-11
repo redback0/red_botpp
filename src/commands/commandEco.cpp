@@ -1,20 +1,52 @@
 
 // #include "main.h"
 #include <dpp/dpp.h>
+#include <exception>
+#include "eco_command.h"
+
+static const std::map<std::string, EcoCommand> ecoCommands = {
+    {"daily", commandEcoDaily},
+    // {"balance", commandEcoBalance},
+    // {"steal", commandEcoSteal}
+};
 
 void commandEco(dpp::cluster& bot, const dpp::slashcommand_t& event)
 {
-    // event.reply("called an eco command");
-
     dpp::command_interaction cmd_data = event.command.get_command_interaction();
     auto& sub = cmd_data.options[0];
-    if (sub.name == "daily")
+    auto& subcommand = ecoCommands.at(sub.name);
+    subcommand.Execute(bot, event);
+}
+
+EcoCommand::EcoCommand()
+    : _Execute()
+{
+}
+
+EcoCommand::EcoCommand(eco_command_func_ptr Execute)
+    : _Execute(Execute)
+{
+}
+
+void EcoCommand::Execute(
+    dpp::cluster& bot, const dpp::slashcommand_t& event) const
+{
+    try
     {
-        // will be moved to a different file, under src/eco/
-        event.reply("You gained 500 points");
+        if (_Execute)
+        {
+            _Execute(bot, event);
+        }
+        else
+        {
+            std::cout << "Unable to find eco subcommand: "
+                << event.command.get_command_interaction().options[0].name
+                << std::endl;
+        }
     }
-    else if (sub.name == "balance")
+    catch (const std::exception& e)
     {
-        event.reply("You probably have a balance mhm");
+        event.reply("EcoCommand failed");
+        std::cerr << e.what() << '\n';
     }
 }

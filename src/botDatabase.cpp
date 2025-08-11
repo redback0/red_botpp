@@ -1,5 +1,5 @@
 
-#include "botDatabase.hpp"
+#include "botDatabase.h"
 #include "main.h"
 #include <stdexcept>
 #include <string>
@@ -36,7 +36,7 @@ void QuickBindParam(
             + param_name + ": no such parameter");
 
     int err = sqlite3_bind_text(
-        stmt, index, value.c_str(), value.length(), SQLITE_STATIC);
+        stmt, index, value.c_str(), value.length(), SQLITE_TRANSIENT);
     if (err != SQLITE_OK)
     {
         throw std::runtime_error(std::string("Unable to bind parameter ")
@@ -65,7 +65,7 @@ void QuickBindParam(
 void QuickBindParam(sqlite3_stmt* stmt, int param_index, std::string value)
 {
     int err = sqlite3_bind_text(
-        stmt, param_index, value.c_str(), value.length(), SQLITE_STATIC);
+        stmt, param_index, value.c_str(), value.length(), SQLITE_TRANSIENT);
     if (err != SQLITE_OK)
     {
         throw std::runtime_error(std::string("Unable to bind parameter ")

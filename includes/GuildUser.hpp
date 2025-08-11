@@ -1,10 +1,10 @@
 
-#include "botDatabase.hpp"
 #include <mutex>
 #include <map>
 #include <random>
 #include <string>
 #include <utility>
+#include "botDatabase.h"
 
 class GuildUser
 {
@@ -56,6 +56,9 @@ public:
 
     GuildUser(std::string guild_id, std::string user_id);
     ~GuildUser() = default;
+
+    sqlite3_int64 getWallet() const;
+    sqlite3_int64 getBank() const;
 
     bool doDaily();
     StealResult doSteal(GuildUser& victim);

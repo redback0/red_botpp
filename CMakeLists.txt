@@ -6,12 +6,13 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 add_executable(${PROJECT_NAME}
     src/main.cpp
     src/commandHandler.cpp
-    src/BotDatabase.cpp
+    src/botDatabase.cpp
     src/GuildUser.cpp
     src/commands/commandTest.cpp
     src/commands/commandRepeat.cpp
     src/commands/commandPing.cpp
     src/commands/commandEco.cpp
+    src/commands/eco/commandEcoDaily.cpp
 )
 
 find_package(DPP REQUIRED)
