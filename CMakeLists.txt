@@ -7,6 +7,7 @@ add_executable(${PROJECT_NAME}
     src/main.cpp
     src/commandHandler.cpp
     src/BotDatabase.cpp
+    src/GuildUser.cpp
     src/commands/commandTest.cpp
     src/commands/commandRepeat.cpp
     src/commands/commandPing.cpp
