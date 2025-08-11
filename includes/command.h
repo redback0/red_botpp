@@ -3,21 +3,28 @@
 
 #include <dpp/dpp.h>
 
+#define INIT_COMMAND_LIST std::vector<dpp::slashcommand> _commands;
 #define ADD_COMMAND(name, description, function, params) \
-    g_command[( name )] = ( function ); \
-    bot.global_command_create( \
+    g_command[( name )] = Command( function ); \
+    _commands.push_back( \
         dpp::slashcommand(( name ), ( description ), bot.me.id) params \
     )
+#define REGISTER_COMMANDS bot.global_bulk_command_create(_commands);
 
 typedef void (*command_func_ptr)(dpp::cluster&, const dpp::slashcommand_t&);
 
 
-class Command : public dpp::slashcommand
+class Command
 {
-    command_func_ptr    Execute;
-};
+private:
+    command_func_ptr    _Execute;
 
-void commandNotFound(dpp::cluster& bot, const dpp::slashcommand_t& event);
+public:
+    Command();
+    Command(command_func_ptr Execute);
+
+    void Execute(dpp::cluster& bot, const dpp::slashcommand_t& event) const;
+};
 
 void commandPing(dpp::cluster& bot, const dpp::slashcommand_t& event);
 void commandTest(dpp::cluster& bot, const dpp::slashcommand_t& event);

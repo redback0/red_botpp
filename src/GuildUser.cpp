@@ -1,7 +1,8 @@
 
 #include "GuildUser.hpp"
-#include "botDatabase.hpp"
+#include "botDatabase.h"
 #include <algorithm>
+#include <exception>
 #include <iostream>
 #include <mutex>
 #include <stdexcept>
@@ -27,7 +28,8 @@ GuildUser::GuildUser(std::string guild_id, std::string user_id)
         std::lock_guard<std::mutex> lock{_map_lock};
 
         // this needs to clear from the map as well
-        _guilduser_lock = std::unique_lock(_locks[guild_id + "_" + user_id]);
+        _guilduser_lock = std::unique_lock(_locks[guild_id + "_" + user_id],
+            std::defer_lock);
     }
 
     _guilduser_lock.lock();
@@ -82,6 +84,16 @@ GuildUser::GuildUser(std::string guild_id, std::string user_id)
         std::cout <<
             "Found more than one identical guilduser in database" << std::endl;
     sqlite3_finalize(read_stmt);
+}
+
+sqlite3_int64 GuildUser::getWallet() const
+{
+    return _wallet;
+}
+
+sqlite3_int64 GuildUser::getBank() const
+{
+    return _bank;
 }
 
 bool GuildUser::doDaily()
