@@ -7,13 +7,13 @@ Commands from original red_bot
 
 [x] test
 [x] repeat
-[ ] cringe
+[x] cringe
 [ ] server
-[ ] eco
+[x] eco -- mvp complete
   [x] daily
   [x] balance
   [x] steal
-  [ ] deposit
+  [x] deposit
   [ ] inventory -- low priority
   [ ] top -- rename to leaderboard
   [ ] give -- mid priority -- needs permissions system

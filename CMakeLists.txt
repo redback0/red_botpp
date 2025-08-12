@@ -8,14 +8,15 @@ add_executable(${PROJECT_NAME}
     src/commandHandler.cpp
     src/botDatabase.cpp
     src/GuildUser.cpp
+    src/commands/commandPing.cpp
     src/commands/commandTest.cpp
     src/commands/commandRepeat.cpp
     src/commands/commandCringe.cpp
-    src/commands/commandPing.cpp
     src/commands/commandEco.cpp
     src/commands/eco/commandEcoDaily.cpp
-    src/commands/eco/commandEcoSteal.cpp
     src/commands/eco/commandEcoBalance.cpp
+    src/commands/eco/commandEcoSteal.cpp
+    src/commands/eco/commandEcoDeposit.cpp
 )
 
 find_package(DPP REQUIRED)

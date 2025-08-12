@@ -55,6 +55,17 @@ void registerCommands(dpp::cluster& bot)
                 )
             )
         )
+        .add_option(
+            dpp::command_option(
+                dpp::command_option_type::co_sub_command,
+                "deposit", "Deposit from wallet to bank", false
+            ).add_option(
+                dpp::command_option(
+                    dpp::command_option_type::co_integer,
+                    "amount", "The amount to deposit. -1 for max", true
+                )
+            )
+        )
     );
     REGISTER_COMMANDS;
 }

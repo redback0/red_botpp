@@ -151,12 +151,12 @@ GuildUser::StealResult GuildUser::doSteal(GuildUser& victim)
 
     if (_steal_result_info.steal_time_diff <= 1h)
     {
-        return StealResult::TO_RECENT;
+        return StealResult::STEAL_TO_RECENT;
     }
 
     if (victim._wallet <= 2000)
     {
-        return StealResult::TO_POOR;
+        return StealResult::STEAL_TO_POOR;
     }
 
     std::discrete_distribution w({
@@ -180,7 +180,7 @@ GuildUser::StealResult GuildUser::doSteal(GuildUser& victim)
             this->_wallet += _steal_result_info.steal_amount;
             
             _last_steal = now.time_since_epoch();
-            return StealResult::SUCCESS;
+            return StealResult::STEAL_SUCCESS;
         }
         case 1: // fail/lose points
         {
@@ -193,22 +193,55 @@ GuildUser::StealResult GuildUser::doSteal(GuildUser& victim)
             this->_wallet -= _steal_result_info.steal_amount;
 
             _last_steal = now.time_since_epoch();
-            return StealResult::FAIL;
+            return StealResult::STEAL_FAIL;
         }
         case 2: // nothing
         {
             _last_steal = now.time_since_epoch();
-            return StealResult::NOTHING;
+            return StealResult::STEAL_NOTHING;
         }
         case 3: // bonus
         {
             // TODO: give this some functionality
             _last_steal = now.time_since_epoch();
-            return StealResult::BONUS;
+            return StealResult::STEAL_BONUS;
         }
     }
 
-    return StealResult::ERROR;
+    return StealResult::STEAL_ERROR;
+}
+
+GuildUser::DepositResult GuildUser::doDeposit(long& amount)
+{
+    long max_move_from_wallet;
+    long max_move_to_bank;
+
+    max_move_from_wallet = _wallet - DEP_WALLET_MIN;
+    max_move_to_bank = (_wallet + _bank) * DEP_BANK_TOTAL_RATIO - _bank;
+
+    if (amount > 0)
+    {
+        if (amount > max_move_from_wallet)
+            return DEP_WALLET_EMPTY;
+
+        if (amount > max_move_to_bank)
+            return DEP_BANK_FULL;
+    }
+    else if (amount == -1)
+    {
+        if (max_move_from_wallet <= 0)
+            return DEP_WALLET_EMPTY;
+        if (max_move_to_bank <= 0)
+            return DEP_BANK_FULL;
+
+        amount = std::min(max_move_from_wallet, max_move_to_bank);
+    }
+    else
+        return DEP_INVALID;
+
+    _wallet -= amount;
+    _bank += amount;
+    return DEP_SUCCESS;
 }
 
 void GuildUser::saveChanges()

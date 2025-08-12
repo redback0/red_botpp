@@ -7,7 +7,8 @@
 static const std::map<std::string, EcoCommand> ecoCommands = {
     {"daily", commandEcoDaily},
     {"balance", commandEcoBalance},
-    {"steal", commandEcoSteal}
+    {"steal", commandEcoSteal},
+    {"deposit", commandEcoDeposit}
 };
 
 void commandEco(dpp::cluster& bot, const dpp::slashcommand_t& event)

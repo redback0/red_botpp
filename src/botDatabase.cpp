@@ -1,6 +1,5 @@
 
 #include "botDatabase.h"
-#include "main.h"
 #include <stdexcept>
 #include <string>
 
