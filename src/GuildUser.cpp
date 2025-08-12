@@ -10,11 +10,9 @@
 #include <unistd.h>
 #include <random>
 
-using namespace std::literals;
-
 extern sqlite3* db;
 
-std::gamma_distribution<double> GuildUser::_steal_distr(3, 5);
+std::gamma_distribution<double> GuildUser::_steal_distr(3, 0.04);
 
 std::mutex GuildUser::_map_lock;
 GuildUser::lock_map_t GuildUser::_locks;
@@ -101,20 +99,31 @@ sqlite3_int64 GuildUser::getBank() const
     return _bank;
 }
 
+std::chrono::duration<long> GuildUser::getStealTimeDiff() const
+{
+    return _steal_result_info.steal_time_diff;
+}
+
+GuildUser::wallet_int GuildUser::getStealAmount() const
+{
+    return _steal_result_info.steal_amount;
+}
+
 bool GuildUser::doDaily()
 {
     gu_tp_t now;
     gu_tp_t last;
 
-    now = std::chrono::system_clock::now();
+    now = std::chrono::time_point_cast<std::chrono::seconds>(
+        std::chrono::system_clock::now());
     last = gu_tp_t(_last_daily);
 
-    last += 24h;
+    now = std::chrono::floor<std::chrono::days>(now);
+    last = std::chrono::floor<std::chrono::days>(last);
 
     if (last < now)
     {
-        _last_daily = std::chrono::duration_cast<gu_time_t>(
-            now.time_since_epoch());
+        _last_daily = now.time_since_epoch();
         _wallet += DAILY_AMOUNT;
         return true;
     }
@@ -126,12 +135,24 @@ bool GuildUser::doDaily()
 
 GuildUser::StealResult GuildUser::doSteal(GuildUser& victim)
 {
+    using namespace std::literals;
+
     std::random_device rd;
     std::mt19937 gen(rd());
 
-    // check date
+    gu_tp_t now;
+    gu_tp_t last;
 
-    // return StealResult::TO_RECENT;
+    now = std::chrono::time_point_cast<std::chrono::seconds>(
+        std::chrono::system_clock::now());
+    last = gu_tp_t(_last_daily);
+
+    _steal_result_info.steal_time_diff = now - last;
+
+    if (_steal_result_info.steal_time_diff <= 1h)
+    {
+        return StealResult::TO_RECENT;
+    }
 
     if (victim._wallet <= 2000)
     {
@@ -152,33 +173,37 @@ GuildUser::StealResult GuildUser::doSteal(GuildUser& victim)
         {
             double percent = _steal_distr(gen);
 
-            wallet_int steal_amount =
+            _steal_result_info.steal_amount =
                 std::min(victim._wallet, this->_wallet) * percent;
 
-            victim._wallet -= steal_amount;
-            this->_wallet += steal_amount;
-
+            victim._wallet -= _steal_result_info.steal_amount;
+            this->_wallet += _steal_result_info.steal_amount;
+            
+            _last_steal = now.time_since_epoch();
             return StealResult::SUCCESS;
         }
         case 1: // fail/lose points
         {
             double percent = _steal_distr(gen);
 
-            wallet_int steal_amount =
+            _steal_result_info.steal_amount =
                 std::min(victim._wallet, this->_wallet) * percent;
 
-            victim._wallet += steal_amount;
-            this->_wallet -= steal_amount;
+            victim._wallet += _steal_result_info.steal_amount;
+            this->_wallet -= _steal_result_info.steal_amount;
 
+            _last_steal = now.time_since_epoch();
             return StealResult::FAIL;
         }
         case 2: // nothing
         {
+            _last_steal = now.time_since_epoch();
             return StealResult::NOTHING;
         }
         case 3: // bonus
         {
             // TODO: give this some functionality
+            _last_steal = now.time_since_epoch();
             return StealResult::BONUS;
         }
     }

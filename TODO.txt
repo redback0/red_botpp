@@ -12,7 +12,7 @@ Commands from original red_bot
 [ ] eco
   [x] daily
   [ ] balance
-  [ ] steal
+  [x] steal
   [ ] deposit
   [ ] inventory
   [ ] top -- rename to leaderboard

@@ -16,7 +16,8 @@ public:
 
     typedef std::chrono::seconds gu_time_t;
 
-    typedef std::chrono::time_point<std::chrono::system_clock> gu_tp_t;
+    typedef std::chrono::time_point<std::chrono::system_clock,
+        std::chrono::seconds> gu_tp_t;
 
     typedef std::string lock_map_key_t;
     typedef std::map<lock_map_key_t, std::mutex> lock_map_t;
@@ -32,6 +33,12 @@ private:
     gu_time_t _last_daily;
     gu_time_t _last_steal;
     // later, inv
+
+    union steal_result_info_t
+    {
+        wallet_int steal_amount;
+        std::chrono::duration<long> steal_time_diff;
+    } _steal_result_info;
 
     static std::mutex _map_lock;
     static lock_map_t _locks;
@@ -68,6 +75,9 @@ public:
 
     sqlite3_int64 getWallet() const;
     sqlite3_int64 getBank() const;
+
+    std::chrono::duration<long> getStealTimeDiff() const;
+    wallet_int getStealAmount() const;
 
     bool doDaily();
     StealResult doSteal(GuildUser& victim);
