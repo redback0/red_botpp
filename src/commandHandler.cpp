@@ -1,4 +1,5 @@
 
+#include <dpp/appcommand.h>
 #include <exception>
 #include <string>
 #include <map>
@@ -37,6 +38,17 @@ void registerCommands(dpp::cluster& bot)
         //         )
         //     )
         // )
+        .add_option(
+            dpp::command_option(
+                dpp::command_option_type::co_sub_command,
+                "steal", "Steal from another user", false
+            ).add_option(
+                dpp::command_option(
+                    dpp::command_option_type::co_user,
+                    "victim", "The user to steal from", true
+                )
+            )
+        )
     );
     REGISTER_COMMANDS;
 }

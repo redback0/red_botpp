@@ -13,6 +13,7 @@ add_executable(${PROJECT_NAME}
     src/commands/commandPing.cpp
     src/commands/commandEco.cpp
     src/commands/eco/commandEcoDaily.cpp
+    src/commands/eco/commandEcoSteal.cpp
 )
 
 find_package(DPP REQUIRED)

@@ -7,7 +7,7 @@ void commandEcoDaily(dpp::cluster& bot, const dpp::slashcommand_t& event)
     dpp::snowflake user_id = event.command.member.user_id;
     dpp::snowflake guild_id = event.command.guild_id;
 
-    GuildUser caller(user_id.str(), guild_id.str());
+    GuildUser caller(guild_id.str(), user_id.str());
 
     if (caller.doDaily())
     {
