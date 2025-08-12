@@ -52,6 +52,11 @@ private:
 
     const static wallet_int DAILY_AMOUNT = 500ll;
 
+public:
+    const static wallet_int DEP_WALLET_MIN = 2000ll;
+private:
+    constexpr const static double DEP_BANK_TOTAL_RATIO = 4.0/5;
+
     const static int STEAL_DEF_SUCCESS_CHANCE = 50;
     const static int STEAL_FAIL_CHANCE = 50;
     const static int STEAL_NOTHING_CHANCE = 5;
@@ -59,15 +64,24 @@ private:
 
 public:
 
+    enum DepositResult
+    {
+        DEP_SUCCESS,
+        DEP_WALLET_EMPTY,
+        DEP_BANK_FULL,
+        DEP_INVALID,
+        DEP_ERROR
+    };
+
     enum StealResult
     {
-        SUCCESS,
-        FAIL,
-        NOTHING,
-        BONUS,
-        TO_POOR,
-        TO_RECENT,
-        ERROR
+        STEAL_SUCCESS,
+        STEAL_FAIL,
+        STEAL_NOTHING,
+        STEAL_BONUS,
+        STEAL_TO_POOR,
+        STEAL_TO_RECENT,
+        STEAL_ERROR
     };
 
     GuildUser(std::string guild_id, std::string user_id);
@@ -81,6 +95,7 @@ public:
 
     bool doDaily();
     StealResult doSteal(GuildUser& victim);
+    DepositResult doDeposit(long& amount);
 
     void saveChanges();
 };
