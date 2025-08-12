@@ -10,6 +10,7 @@ add_executable(${PROJECT_NAME}
     src/GuildUser.cpp
     src/commands/commandTest.cpp
     src/commands/commandRepeat.cpp
+    src/commands/commandCringe.cpp
     src/commands/commandPing.cpp
     src/commands/commandEco.cpp
     src/commands/eco/commandEcoDaily.cpp

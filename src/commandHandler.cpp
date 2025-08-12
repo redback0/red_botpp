@@ -20,6 +20,12 @@ void registerCommands(dpp::cluster& bot)
             "text", "String to repeat", true
         ))
     );
+    ADD_COMMAND("cringe", "How cringe is this", commandCringe,
+        .add_option(dpp::command_option(
+            dpp::command_option_type::co_string,
+            "text", "😬", false
+        ))
+    );
     ADD_COMMAND("eco", "A set of economy commands", commandEco,
         .add_option(
             dpp::command_option(
