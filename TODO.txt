@@ -11,15 +11,15 @@ Commands from original red_bot
 [ ] server
 [ ] eco
   [x] daily
-  [ ] balance
+  [x] balance
   [x] steal
   [ ] deposit
-  [ ] inventory
+  [ ] inventory -- low priority
   [ ] top -- rename to leaderboard
-  [ ] give
+  [ ] give -- mid priority -- needs permissions system
   [ ] withdraw
-  [ ] shop
-  [ ] use
+  [ ] shop -- low priority
+  [ ] use -- low priority
 [ ] rrsetup
 [ ] rrdel
 [ ] mjoin

@@ -29,4 +29,5 @@ public:
 void commandPing(dpp::cluster& bot, const dpp::slashcommand_t& event);
 void commandTest(dpp::cluster& bot, const dpp::slashcommand_t& event);
 void commandRepeat(dpp::cluster& bot, const dpp::slashcommand_t& event);
+void commandCringe(dpp::cluster& bot, const dpp::slashcommand_t& event);
 void commandEco(dpp::cluster& bot, const dpp::slashcommand_t& event);
