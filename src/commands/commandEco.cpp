@@ -6,7 +6,7 @@
 
 static const std::map<std::string, EcoCommand> ecoCommands = {
     {"daily", commandEcoDaily},
-    // {"balance", commandEcoBalance},
+    {"balance", commandEcoBalance},
     {"steal", commandEcoSteal}
 };
 

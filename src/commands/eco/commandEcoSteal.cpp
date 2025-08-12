@@ -19,19 +19,26 @@ void commandEcoSteal(dpp::cluster& bot, const dpp::slashcommand_t& event)
     switch (caller.doSteal(victim))
     {
     case GuildUser::SUCCESS:
+        caller.saveChanges();
+        victim.saveChanges();
         event.reply("Success! Stealing "s +
             std::to_string(caller.getStealAmount()) + " points from " +
             dpp::user::get_mention(victim_id));
     break;
     case GuildUser::FAIL:
+        caller.saveChanges();
+        victim.saveChanges();
         event.reply("Oops, got caught. You paid "s +
             std::to_string(caller.getStealAmount()) + " points to " +
             dpp::user::get_mention(victim_id));
     break;
     case GuildUser::NOTHING:
+        caller.saveChanges();
         event.reply("You looked everywhere but couldn't find anything");
     break;
     case GuildUser::BONUS:
+        caller.saveChanges();
+        victim.saveChanges();
         event.reply("How'd you manage this?");
     break;
     case GuildUser::TO_POOR:
@@ -47,7 +54,4 @@ void commandEcoSteal(dpp::cluster& bot, const dpp::slashcommand_t& event)
         return;
     break;
     }
-
-    caller.saveChanges();
-    victim.saveChanges();
 }

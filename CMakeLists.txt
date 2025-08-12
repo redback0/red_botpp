@@ -14,6 +14,7 @@ add_executable(${PROJECT_NAME}
     src/commands/commandEco.cpp
     src/commands/eco/commandEcoDaily.cpp
     src/commands/eco/commandEcoSteal.cpp
+    src/commands/eco/commandEcoBalance.cpp
 )
 
 find_package(DPP REQUIRED)
