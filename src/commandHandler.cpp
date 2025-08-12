@@ -27,17 +27,17 @@ void registerCommands(dpp::cluster& bot)
                 "daily", "Free points, daily", false
             )
         )
-        // .add_option(
-        //     dpp::command_option(
-        //         dpp::command_option_type::co_sub_command,
-        //         "balance", "Check your account balance", false
-        //     ).add_option(
-        //         dpp::command_option(
-        //             dpp::command_option_type::co_user,
-        //             "user", "User who's balance to check", false
-        //         )
-        //     )
-        // )
+        .add_option(
+            dpp::command_option(
+                dpp::command_option_type::co_sub_command,
+                "balance", "Check your account balance", false
+            ).add_option(
+                dpp::command_option(
+                    dpp::command_option_type::co_user,
+                    "user", "User who's balance to check", false
+                )
+            )
+        )
         .add_option(
             dpp::command_option(
                 dpp::command_option_type::co_sub_command,
