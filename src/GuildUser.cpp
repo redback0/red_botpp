@@ -259,7 +259,7 @@ GuildUser::StealResult GuildUser::doSteal(GuildUser& victim)
 
     now = std::chrono::time_point_cast<std::chrono::seconds>(
         std::chrono::system_clock::now());
-    last = gu_tp_t(_last_daily);
+    last = gu_tp_t(_last_steal);
 
     _steal_result_info.steal_time_diff = now - last;
 
@@ -272,6 +272,8 @@ GuildUser::StealResult GuildUser::doSteal(GuildUser& victim)
     {
         return StealResult::STEAL_TO_POOR;
     }
+
+    _last_steal = now.time_since_epoch();
 
     std::discrete_distribution w({
         (double(victim._wallet) / this->_wallet) * STEAL_DEF_SUCCESS_CHANCE,
