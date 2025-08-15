@@ -61,7 +61,7 @@ void commandEcoSteal(dpp::cluster& bot, const dpp::slashcommand_t& event)
     case GuildUser::STEAL_TO_RECENT:
         event.reply("You stole too recently, wait "s +
             std::to_string(std::chrono::duration_cast<std::chrono::minutes>(
-                caller.getStealTimeDiff()).count()) + " minutes");
+                1h - caller.getStealTimeDiff()).count()) + " minutes");
     break;
     case GuildUser::STEAL_ERROR:
         event.reply("You broke something >:(");
