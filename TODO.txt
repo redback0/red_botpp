@@ -15,7 +15,7 @@ Commands from original red_bot
   [x] steal
   [x] deposit
   [ ] inventory -- low priority
-  [ ] top -- rename to leaderboard
+  [x] top -- rename to leaderboard
   [ ] give -- mid priority -- needs permissions system
   [ ] withdraw
   [ ] shop -- low priority

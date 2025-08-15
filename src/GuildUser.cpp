@@ -3,6 +3,7 @@
 #include "botDatabase.h"
 #include <algorithm>
 #include <chrono>
+#include <cstddef>
 #include <exception>
 #include <iostream>
 #include <mutex>
@@ -106,6 +107,48 @@ GuildUser::GuildUser(id_t guild_id, sqlite3_stmt* read_stmt)
     _last_steal = gu_time_t(sqlite3_column_int(read_stmt, 5));
 }
 
+std::vector<GuildUser> GuildUser::getRichestN(id_t guild_id, int n)
+{
+    std::vector<GuildUser> users;
+    sqlite3_stmt* read_stmt;
+    int err;
+
+    std::lock_guard<std::mutex> lock(_multiguilduser_lock);
+
+    err = sqlite3_prepare_v2(db, DB_READ_GUILD, -1, &read_stmt, NULL);
+    if (err != SQLITE_OK)
+    {
+        throw (std::runtime_error("Unable to prepare statement: "s +
+            sqlite3_errmsg(db)));
+    }
+
+    QuickBindParam(read_stmt, 1, guild_id);
+
+    for (int i = 0;
+        i < n && (err = sqlite3_step(read_stmt)) != SQLITE_DONE;
+        i++)
+    {
+        switch (err)
+        {
+        case SQLITE_ROW:
+            users.push_back(GuildUser(guild_id, read_stmt));
+        break;
+        case SQLITE_BUSY:
+            sleep(1);
+            continue;
+        break;
+        default:
+            sqlite3_finalize(read_stmt);
+            throw std::runtime_error("Step returned unexpected value");
+        break;
+        }
+    }
+
+    sqlite3_finalize(read_stmt);
+
+    return users;
+}
+
 std::vector<GuildUser> GuildUser::getWholeGuild(id_t guild_id)
 {
     std::vector<GuildUser> users;
@@ -117,9 +160,8 @@ std::vector<GuildUser> GuildUser::getWholeGuild(id_t guild_id)
     err = sqlite3_prepare_v2(db, DB_READ_GUILD, -1, &read_stmt, NULL);
     if (err != SQLITE_OK)
     {
-        throw (std::runtime_error(std::string(
-            "Unable to prepare statement: ")
-            + sqlite3_errmsg(db)));
+        throw (std::runtime_error("Unable to prepare statement: "s +
+            sqlite3_errmsg(db)));
     }
 
     QuickBindParam(read_stmt, 1, guild_id);
