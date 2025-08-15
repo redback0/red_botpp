@@ -6,6 +6,7 @@
 #include <exception>
 #include <iostream>
 #include <mutex>
+#include <sqlite3.h>
 #include <stdexcept>
 #include <unistd.h>
 #include <random>
@@ -19,7 +20,7 @@ GuildUser::lock_map_t GuildUser::_locks;
 
 std::mutex GuildUser::_multiguilduser_lock;
 
-GuildUser::GuildUser(std::string guild_id, std::string user_id)
+GuildUser::GuildUser(id_t guild_id, id_t user_id)
 {
     int err;
     sqlite3_stmt* read_stmt;
@@ -31,8 +32,8 @@ GuildUser::GuildUser(std::string guild_id, std::string user_id)
         std::lock_guard<std::mutex> lock{_map_lock};
 
         // this needs to clear from the map as well
-        _guilduser_lock = std::unique_lock(_locks[guild_id + "_" + user_id],
-            std::defer_lock);
+        _guilduser_lock = std::unique_lock(
+            _locks[std::pair(guild_id, user_id)], std::defer_lock);
     }
 
     _guilduser_lock.lock();
@@ -45,23 +46,8 @@ GuildUser::GuildUser(std::string guild_id, std::string user_id)
             + sqlite3_errmsg(db)));
     }
 
-    err = sqlite3_bind_text(read_stmt, 1, guild_id.c_str(), guild_id.length(), SQLITE_STATIC);
-    if (err != SQLITE_OK)
-    {
-        sqlite3_finalize(read_stmt);
-        throw (std::runtime_error(std::string(
-            "Unable to bind paramenter for guild_id: ")
-            + sqlite3_errmsg(db)));
-    }
-
-    err = sqlite3_bind_text(read_stmt, 2, user_id.c_str(), user_id.length(), SQLITE_STATIC);
-    if (err != SQLITE_OK)
-    {
-        sqlite3_finalize(read_stmt);
-        throw (std::runtime_error(std::string(
-            "Unable to bind paramenter for user_id: ")
-            + sqlite3_errmsg(db)));
-    }
+    QuickBindParam(read_stmt, 1, guild_id);
+    QuickBindParam(read_stmt, 2, user_id);
 
     while ((err = sqlite3_step(read_stmt)) == SQLITE_BUSY)
     {
@@ -84,24 +70,32 @@ GuildUser::GuildUser(std::string guild_id, std::string user_id)
         _last_daily = DEFAULT_LAST_DAILY;
         _last_steal = DEFUALT_LAST_STEAL;
     break;
+    default:
+        sqlite3_finalize(read_stmt);
+        throw std::runtime_error("Error reading from DB: "s +
+            sqlite3_errmsg(db));
+    break;
     }
     while (sqlite3_step(read_stmt) != SQLITE_DONE)
+    {
+        // note: this isn't the only possibility, I should come back to this
         std::cout <<
             "Found more than one identical guilduser in database" << std::endl;
+    }
     sqlite3_finalize(read_stmt);
 }
 
-GuildUser::GuildUser(std::string guild_id, sqlite3_stmt* read_stmt)
+GuildUser::GuildUser(id_t guild_id, sqlite3_stmt* read_stmt)
 {
     _is_new_user = false;
     _guild_id = guild_id;
-    _user_id = (char *)sqlite3_column_text(read_stmt, 1);
+    _user_id = sqlite3_column_int64(read_stmt, 1);
 
     {
         std::lock_guard<std::mutex> lock{_map_lock};
 
-        _guilduser_lock = std::unique_lock(_locks[guild_id + "_" + _user_id],
-            std::defer_lock);
+        _guilduser_lock = std::unique_lock(
+            _locks[std::pair(guild_id, _user_id)], std::defer_lock);
     }
 
     _guilduser_lock.lock();
@@ -112,7 +106,7 @@ GuildUser::GuildUser(std::string guild_id, sqlite3_stmt* read_stmt)
     _last_steal = gu_time_t(sqlite3_column_int(read_stmt, 5));
 }
 
-std::vector<GuildUser> GuildUser::getWholeGuild(std::string guild_id)
+std::vector<GuildUser> GuildUser::getWholeGuild(id_t guild_id)
 {
     std::vector<GuildUser> users;
     sqlite3_stmt* read_stmt;
@@ -152,6 +146,11 @@ std::vector<GuildUser> GuildUser::getWholeGuild(std::string guild_id)
     return users;
 }
 
+GuildUser::id_t GuildUser::getUserID() const
+{
+    return _user_id;
+}
+
 sqlite3_int64 GuildUser::getWallet() const
 {
     return _wallet;
@@ -160,6 +159,11 @@ sqlite3_int64 GuildUser::getWallet() const
 sqlite3_int64 GuildUser::getBank() const
 {
     return _bank;
+}
+
+sqlite3_int64 GuildUser::getNetWorth() const
+{
+    return _wallet + _bank;
 }
 
 std::mutex& GuildUser::getMultiGuildUserReadLock()
@@ -343,7 +347,7 @@ void GuildUser::saveChanges()
     QuickBindParam(write_stmt, "$guild_id", _guild_id);
     QuickBindParam(write_stmt, "$user_id", _user_id);
     QuickBindParam(write_stmt, "$wallet", _wallet);
-    QuickBindParam(write_stmt, "$bank", _wallet);
+    QuickBindParam(write_stmt, "$bank", _bank);
     QuickBindParam(write_stmt, "$last_daily", _last_daily.count());
     QuickBindParam(write_stmt, "$last_steal", _last_steal.count());
 

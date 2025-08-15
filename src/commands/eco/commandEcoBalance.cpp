@@ -43,7 +43,7 @@ void commandEcoBalance(dpp::cluster& bot, const dpp::slashcommand_t& event)
         }
     }
 
-    GuildUser user(guild_id.str(), user_id.str());
+    GuildUser user(guild_id, user_id);
 
     dpp::embed msg;
 

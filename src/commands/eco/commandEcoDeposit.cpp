@@ -10,7 +10,7 @@ void commandEcoDeposit(dpp::cluster& bot, const dpp::slashcommand_t& event)
     dpp::snowflake guild_id = event.command.guild_id;
     dpp::snowflake user_id = event.command.member.user_id;
 
-    GuildUser caller(guild_id.str(), user_id.str());
+    GuildUser caller(guild_id, user_id);
 
     switch(caller.doDeposit(amount))
     {

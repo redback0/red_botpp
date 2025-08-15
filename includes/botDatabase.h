@@ -7,8 +7,8 @@
 // "PRAGMA user_version = 1;" // use this for updating database
 #define DB_INIT_SQL \
     "CREATE TABLE IF NOT EXISTS guilduser (" \
-        "guild_id TEXT," \
-        "user_id TEXT," \
+        "guild_id INTEGER," \
+        "user_id INTEGER," \
         "wallet INTEGER," \
         "bank INTEGER," \
         "last_daily INTEGER," \
@@ -20,7 +20,7 @@
     "SELECT * FROM guilduser WHERE guild_id = ? AND user_id = ?"
 
 #define DB_READ_GUILD \
-    "SELECT * FROM guilduser WHERE guild_id = ?"
+    "SELECT * FROM guilduser WHERE guild_id = ? ORDER BY (wallet + bank) DESC"
 
 #define DB_INSERT_GUILDUSER \
     "INSERT INTO guilduser (" \
@@ -45,3 +45,4 @@ void QuickBindParam(
 void QuickBindParam(
     sqlite3_stmt *stmt, std::string param_name, sqlite3_int64 value);
 void QuickBindParam(sqlite3_stmt *stmt, int param_index, std::string value);
+void QuickBindParam(sqlite3_stmt *stmt, int param_index, sqlite3_int64 value);

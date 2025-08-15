@@ -78,3 +78,14 @@ void QuickBindParam(sqlite3_stmt* stmt, int param_index, std::string value)
             + std::to_string(param_index) + ": Bind failed");
     }
 }
+
+void QuickBindParam(sqlite3_stmt* stmt, int param_index, sqlite3_int64 value)
+{
+    int err = sqlite3_bind_int64(stmt, param_index, value);
+    if (err != SQLITE_OK)
+    {
+        sqlite3_finalize(stmt);
+        throw std::runtime_error(std::string("Unable to bind parameter ")
+            + std::to_string(param_index) + ": Bind failed");
+    }
+}
