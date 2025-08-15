@@ -19,6 +19,9 @@
 #define DB_READ_GUILDUSER \
     "SELECT * FROM guilduser WHERE guild_id = ? AND user_id = ?"
 
+#define DB_READ_GUILD \
+    "SELECT * FROM guilduser WHERE guild_id = ?"
+
 #define DB_INSERT_GUILDUSER \
     "INSERT INTO guilduser (" \
         "guild_id," \
