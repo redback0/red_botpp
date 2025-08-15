@@ -66,6 +66,12 @@ void registerCommands(dpp::cluster& bot)
                 )
             )
         )
+        .add_option(
+            dpp::command_option(
+                dpp::command_option_type::co_sub_command,
+                "leaderboard", "See the leaderboard!", false
+            )
+        )
     );
     REGISTER_COMMANDS;
 }

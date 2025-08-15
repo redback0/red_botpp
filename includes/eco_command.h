@@ -22,3 +22,4 @@ void commandEcoDaily(dpp::cluster& bot, const dpp::slashcommand_t& event);
 void commandEcoBalance(dpp::cluster& bot, const dpp::slashcommand_t& event);
 void commandEcoSteal(dpp::cluster& bot, const dpp::slashcommand_t& event);
 void commandEcoDeposit(dpp::cluster& bot, const dpp::slashcommand_t& event);
+void commandEcoLeaderboard(dpp::cluster& bot, const dpp::slashcommand_t& event);

@@ -5,6 +5,7 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 add_executable(${PROJECT_NAME}
     src/main.cpp
+    src/dppUtils.cpp
     src/commandHandler.cpp
     src/botDatabase.cpp
     src/GuildUser.cpp
@@ -17,6 +18,7 @@ add_executable(${PROJECT_NAME}
     src/commands/eco/commandEcoBalance.cpp
     src/commands/eco/commandEcoSteal.cpp
     src/commands/eco/commandEcoDeposit.cpp
+    src/commands/eco/commandEcoLeaderboard.cpp
 )
 
 find_package(DPP REQUIRED)

@@ -8,15 +8,25 @@ static const std::map<std::string, EcoCommand> ecoCommands = {
     {"daily", commandEcoDaily},
     {"balance", commandEcoBalance},
     {"steal", commandEcoSteal},
-    {"deposit", commandEcoDeposit}
+    {"deposit", commandEcoDeposit},
+    {"leaderboard", commandEcoLeaderboard}
 };
 
 void commandEco(dpp::cluster& bot, const dpp::slashcommand_t& event)
 {
     dpp::command_interaction cmd_data = event.command.get_command_interaction();
     auto& sub = cmd_data.options[0];
-    auto& subcommand = ecoCommands.at(sub.name);
-    subcommand.Execute(bot, event);
+    try
+    {
+        auto& subcommand = ecoCommands.at(sub.name);
+        subcommand.Execute(bot, event);
+    }
+    catch (const std::exception& e)
+    {
+        event.reply("EcoCommand failed");
+        std::cerr << "Command failed: Likely command not found: "
+            << e.what() << '\n';
+    }
 }
 
 EcoCommand::EcoCommand()

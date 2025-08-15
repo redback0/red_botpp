@@ -20,7 +20,10 @@ std::string get_bot_token()
 int main(int ac, char** av)
 {
     InitDB();
-    dpp::cluster bot(get_bot_token(), dpp::i_default_intents | dpp::i_message_content);
+    dpp::cluster bot(get_bot_token(),
+        dpp::i_default_intents |
+        dpp::i_message_content |
+        dpp::i_guild_members);
 
     bot.on_log(dpp::utility::cout_logger());
 
