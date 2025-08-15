@@ -23,6 +23,8 @@ public:
     typedef std::map<lock_map_key_t, std::mutex> lock_map_t;
 private:
 
+    GuildUser(std::string guild_id, sqlite3_stmt* read_stmt);
+
     std::unique_lock<std::mutex> _guilduser_lock;
 
     bool        _is_new_user;
@@ -42,6 +44,7 @@ private:
 
     static std::mutex _map_lock;
     static lock_map_t _locks;
+    static std::mutex _multiguilduser_lock;
 
     static std::gamma_distribution<double> _steal_distr;
 
@@ -84,11 +87,22 @@ public:
         STEAL_ERROR
     };
 
+    GuildUser() = default;
     GuildUser(std::string guild_id, std::string user_id);
     ~GuildUser() = default;
 
+    GuildUser(GuildUser&) = delete;
+    GuildUser(GuildUser&&) = default;
+
+    GuildUser& operator=(GuildUser&) = delete;
+    GuildUser& operator=(GuildUser&&) = default;
+
+    static std::vector<GuildUser> getWholeGuild(std::string guild_id);
+
     sqlite3_int64 getWallet() const;
     sqlite3_int64 getBank() const;
+
+    static std::mutex& getMultiGuildUserReadLock();
 
     std::chrono::duration<long> getStealTimeDiff() const;
     wallet_int getStealAmount() const;

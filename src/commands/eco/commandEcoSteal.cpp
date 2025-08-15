@@ -13,8 +13,15 @@ void commandEcoSteal(dpp::cluster& bot, const dpp::slashcommand_t& event)
     dpp::snowflake caller_id = event.command.member.user_id;
     dpp::snowflake guild_id = event.command.guild_id;
 
-    GuildUser caller(guild_id.str(), caller_id.str());
-    GuildUser victim(guild_id.str(), victim_id.str());
+    GuildUser caller;
+    GuildUser victim;
+
+    {
+        std::lock_guard lock{GuildUser::getMultiGuildUserReadLock()};
+
+        caller = GuildUser(guild_id.str(), caller_id.str());
+        victim = GuildUser(guild_id.str(), victim_id.str());
+    }
 
     switch (caller.doSteal(victim))
     {

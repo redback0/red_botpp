@@ -17,6 +17,8 @@ std::gamma_distribution<double> GuildUser::_steal_distr(3, 0.04);
 std::mutex GuildUser::_map_lock;
 GuildUser::lock_map_t GuildUser::_locks;
 
+std::mutex GuildUser::_multiguilduser_lock;
+
 GuildUser::GuildUser(std::string guild_id, std::string user_id)
 {
     int err;
@@ -89,6 +91,67 @@ GuildUser::GuildUser(std::string guild_id, std::string user_id)
     sqlite3_finalize(read_stmt);
 }
 
+GuildUser::GuildUser(std::string guild_id, sqlite3_stmt* read_stmt)
+{
+    _is_new_user = false;
+    _guild_id = guild_id;
+    _user_id = (char *)sqlite3_column_text(read_stmt, 1);
+
+    {
+        std::lock_guard<std::mutex> lock{_map_lock};
+
+        _guilduser_lock = std::unique_lock(_locks[guild_id + "_" + _user_id],
+            std::defer_lock);
+    }
+
+    _guilduser_lock.lock();
+
+    _wallet = sqlite3_column_int64(read_stmt, 2);
+    _bank = sqlite3_column_int64(read_stmt, 3);
+    _last_daily = gu_time_t(sqlite3_column_int(read_stmt, 4));
+    _last_steal = gu_time_t(sqlite3_column_int(read_stmt, 5));
+}
+
+std::vector<GuildUser> GuildUser::getWholeGuild(std::string guild_id)
+{
+    std::vector<GuildUser> users;
+    sqlite3_stmt* read_stmt;
+    int err;
+
+    std::lock_guard<std::mutex> lock(_multiguilduser_lock);
+
+    err = sqlite3_prepare_v2(db, DB_READ_GUILD, -1, &read_stmt, NULL);
+    if (err != SQLITE_OK)
+    {
+        throw (std::runtime_error(std::string(
+            "Unable to prepare statement: ")
+            + sqlite3_errmsg(db)));
+    }
+
+    QuickBindParam(read_stmt, 1, guild_id);
+
+    while ((err = sqlite3_step(read_stmt)) != SQLITE_DONE)
+    {
+        switch (err)
+        {
+        case SQLITE_ROW:
+            users.push_back(GuildUser(guild_id, read_stmt));
+        break;
+        case SQLITE_BUSY:
+            // make this more inteligent
+            sleep(1);
+        break;
+        default:
+            sqlite3_finalize(read_stmt);
+            throw std::runtime_error("Step returned unexpected value");
+        }
+    }
+
+    sqlite3_finalize(read_stmt);
+
+    return users;
+}
+
 sqlite3_int64 GuildUser::getWallet() const
 {
     return _wallet;
@@ -97,6 +160,11 @@ sqlite3_int64 GuildUser::getWallet() const
 sqlite3_int64 GuildUser::getBank() const
 {
     return _bank;
+}
+
+std::mutex& GuildUser::getMultiGuildUserReadLock()
+{
+    return _multiguilduser_lock;
 }
 
 std::chrono::duration<long> GuildUser::getStealTimeDiff() const
