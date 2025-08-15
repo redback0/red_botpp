@@ -1,5 +1,6 @@
 
 #include <dpp/dpp.h>
+#include <dpp/scheduled_event.h>
 #include <dpp/snowflake.h>
 #include <sstream>
 #include <string>
@@ -13,14 +14,20 @@ void commandEcoSteal(dpp::cluster& bot, const dpp::slashcommand_t& event)
     dpp::snowflake caller_id = event.command.member.user_id;
     dpp::snowflake guild_id = event.command.guild_id;
 
+    if (victim_id == caller_id)
+    {
+        event.reply("You can't steal from yourself!");
+        return;
+    }
+
     GuildUser caller;
     GuildUser victim;
 
     {
         std::lock_guard lock{GuildUser::getMultiGuildUserReadLock()};
 
-        caller = GuildUser(guild_id.str(), caller_id.str());
-        victim = GuildUser(guild_id.str(), victim_id.str());
+        caller = GuildUser(guild_id, caller_id);
+        victim = GuildUser(guild_id, victim_id);
     }
 
     switch (caller.doSteal(victim))

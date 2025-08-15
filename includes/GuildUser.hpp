@@ -3,6 +3,7 @@
 #include <mutex>
 #include <map>
 #include <random>
+#include <sqlite3.h>
 #include <string>
 #include <utility>
 #include "botDatabase.h"
@@ -12,6 +13,7 @@ using namespace std::literals;
 class GuildUser
 {
 public:
+    typedef sqlite3_int64 id_t;
     typedef sqlite3_int64 wallet_int;
 
     typedef std::chrono::seconds gu_time_t;
@@ -19,22 +21,21 @@ public:
     typedef std::chrono::time_point<std::chrono::system_clock,
         std::chrono::seconds> gu_tp_t;
 
-    typedef std::string lock_map_key_t;
+    typedef std::pair<int, int> lock_map_key_t;
     typedef std::map<lock_map_key_t, std::mutex> lock_map_t;
 private:
 
-    GuildUser(std::string guild_id, sqlite3_stmt* read_stmt);
+    GuildUser(id_t guild_id, sqlite3_stmt* read_stmt);
 
     std::unique_lock<std::mutex> _guilduser_lock;
 
     bool        _is_new_user;
-    std::string _guild_id;
-    std::string _user_id;
-    wallet_int   _wallet;
-    wallet_int   _bank;
-    gu_time_t _last_daily;
-    gu_time_t _last_steal;
-    // later, inv
+    id_t        _guild_id;
+    id_t        _user_id;
+    wallet_int  _wallet;
+    wallet_int  _bank;
+    gu_time_t   _last_daily;
+    gu_time_t   _last_steal;
 
     union steal_result_info_t
     {
@@ -88,7 +89,7 @@ public:
     };
 
     GuildUser() = default;
-    GuildUser(std::string guild_id, std::string user_id);
+    GuildUser(id_t guild_id, id_t user_id);
     ~GuildUser() = default;
 
     GuildUser(GuildUser&) = delete;
@@ -97,10 +98,13 @@ public:
     GuildUser& operator=(GuildUser&) = delete;
     GuildUser& operator=(GuildUser&&) = default;
 
-    static std::vector<GuildUser> getWholeGuild(std::string guild_id);
+    static std::vector<GuildUser> getRichestN(id_t guild_id, int n);
+    static std::vector<GuildUser> getWholeGuild(id_t guild_id);
 
-    sqlite3_int64 getWallet() const;
-    sqlite3_int64 getBank() const;
+    id_t            getUserID() const;
+    sqlite3_int64   getWallet() const;
+    sqlite3_int64   getBank() const;
+    sqlite3_int64   getNetWorth() const;
 
     static std::mutex& getMultiGuildUserReadLock();
 
