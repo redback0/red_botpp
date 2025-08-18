@@ -1,8 +1,10 @@
 
+#include <filesystem>
 #include <mpg123.h>
 #include <out123.h>
 #include <string>
 #include <vector>
+#include <iostream>
 
 std::vector<uint8_t> getDecodedAudio(std::string file_name)
 {

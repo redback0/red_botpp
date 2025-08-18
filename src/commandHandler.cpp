@@ -6,6 +6,7 @@
 #include <dpp/dpp.h>
 #include "main.h"
 #include "command.h"
+#include "audioUtils.h"
 
 std::map<std::string, Command> g_command;
 
@@ -78,14 +79,20 @@ void registerCommands(dpp::cluster& bot)
         )
     );
     ADD_COMMAND("join", "Join voice call", commandJoin,);
+    dpp::command_option sound_option(
+        dpp::command_option_type::co_string,
+        "sound", "The sound to play", true
+    );
+    for (auto& ai: std::filesystem::directory_iterator("./audio"))
+    {
+        std::cout << "Found audio file: " << ai << std::endl;
+        std::string s = ai.path().stem();
+        sound_option.add_choice(dpp::command_option_choice(s, s));
+    }
+    // todo: make this reloadable
     ADD_COMMAND("play", "Play a sound in the voice call", commandPlay,
         .add_option(
-            dpp::command_option(
-                dpp::command_option_type::co_string,
-                "sound", "The sound to play", true
-            )
-            .add_choice(dpp::command_option_choice("anime wow", "anime wow"))
-            .add_choice(dpp::command_option_choice("robot", "robot"))
+            sound_option
         )
     );
     ADD_COMMAND("leave", "Leave current voice call", commandLeave,);
