@@ -31,3 +31,6 @@ void commandTest(dpp::cluster& bot, const dpp::slashcommand_t& event);
 void commandRepeat(dpp::cluster& bot, const dpp::slashcommand_t& event);
 void commandCringe(dpp::cluster& bot, const dpp::slashcommand_t& event);
 void commandEco(dpp::cluster& bot, const dpp::slashcommand_t& event);
+void commandJoin(dpp::cluster& bot, const dpp::slashcommand_t& event);
+void commandPlay(dpp::cluster& bot, const dpp::slashcommand_t& event);
+void commandLeave(dpp::cluster& bot, const dpp::slashcommand_t& event);
