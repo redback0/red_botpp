@@ -15,16 +15,20 @@ void registerCommands(dpp::cluster& bot)
     ADD_COMMAND("ping", "Ping pong!", commandPing,);
     ADD_COMMAND("test", "This is a test", commandTest,);
     ADD_COMMAND("repeat", "Repeat a message", commandRepeat,
-        .add_option(dpp::command_option(
-            dpp::command_option_type::co_string,
-            "text", "String to repeat", true
-        ))
+        .add_option(
+            dpp::command_option(
+                dpp::command_option_type::co_string,
+                "text", "String to repeat", true
+            )
+        )
     );
     ADD_COMMAND("cringe", "How cringe is this", commandCringe,
-        .add_option(dpp::command_option(
-            dpp::command_option_type::co_string,
-            "text", "😬", false
-        ))
+        .add_option(
+            dpp::command_option(
+                dpp::command_option_type::co_string,
+                "text", "😬", false
+            )
+        )
     );
     ADD_COMMAND("eco", "A set of economy commands", commandEco,
         .add_option(
@@ -73,6 +77,18 @@ void registerCommands(dpp::cluster& bot)
             )
         )
     );
+    ADD_COMMAND("join", "Join voice call", commandJoin,);
+    ADD_COMMAND("play", "Play a sound in the voice call", commandPlay,
+        .add_option(
+            dpp::command_option(
+                dpp::command_option_type::co_string,
+                "sound", "The sound to play", true
+            )
+            .add_choice(dpp::command_option_choice("anime wow", "anime wow"))
+            .add_choice(dpp::command_option_choice("robot", "robot"))
+        )
+    );
+    ADD_COMMAND("leave", "Leave current voice call", commandLeave,);
     REGISTER_COMMANDS;
 }
 

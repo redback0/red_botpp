@@ -32,3 +32,19 @@ Commands from original red_bot
 [x] slash commands for all commands -- not doing chat commands for now
 [x] guild user data as database
 [ ] voice listening features :]
+
+# Reworked economy system
+wallet -> gems
+gems will work similarly to how the current wallet works; you can daily and
+steal. However, you will no longer deposit to the bank.
+
+bank -> red_coin
+red_coin will be earned via a new system of "generators"
+
++ generator
+your first generator will be bought with gems, with better generators costing
+red_coin as well.
+generators will give a certain red_coin per second, which is semi random from
+when you bought it.
+potentially, generators will be upgradable as well.
+you'll be ranked by how much red_coin you have
