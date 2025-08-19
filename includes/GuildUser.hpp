@@ -57,7 +57,7 @@ private:
     const static wallet_int DAILY_AMOUNT = 500ll;
 
 public:
-    const static wallet_int DEP_WALLET_MIN = 2000ll;
+    const static wallet_int DEP_WALLET_MIN = 3000ll;
 private:
     constexpr const static double DEP_BANK_TOTAL_RATIO = 4.0/5;
 
