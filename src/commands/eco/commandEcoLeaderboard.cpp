@@ -1,6 +1,7 @@
 
 #include <algorithm>
 #include <dpp/dispatcher.h>
+#include <dpp/exception.h>
 #include <dpp/snowflake.h>
 #include <exception>
 #include <semaphore>
@@ -11,12 +12,45 @@
 #include "GuildUser.hpp"
 #include "dppUtils.h"
 
+void guildMemberCallback(
+    dpp::cluster& bot,
+    const dpp::confirmation_callback_t& event,
+    dpp::snowflake guild_id,
+    dpp::snowflake user_id,
+    std::counting_semaphore<10>& sem,
+    std::string& name)
+{
+    if (event.is_error())
+    {
+        if (event.get_error().code == dpp::err_rate_limited)
+        {
+            bot.guild_get_member(guild_id, user_id,
+                [&bot, &sem, guild_id, user_id, &name](const dpp::confirmation_callback_t& event)
+                {
+                    guildMemberCallback(
+                        bot, event, guild_id, user_id, sem, name);
+                });
+            return;
+        }
+
+        name = "UNKNOWN_USER";
+    }
+    else
+    {
+        const dpp::guild_member& member =
+            event.get<dpp::guild_member>();
+
+        name = getUserDisplayName(member);
+    }
+    sem.release();
+}
+
 std::vector<std::string> getNamesIndividually(
     dpp::cluster& bot,
     std::vector<GuildUser>& users,
     dpp::snowflake guild_id)
 {
-    std::counting_semaphore sem(10);
+    std::counting_semaphore<10> sem(10);
 
     std::vector<std::string> names(users.size());
 
@@ -24,22 +58,12 @@ std::vector<std::string> getNamesIndividually(
     {
         sem.acquire();
         bot.guild_get_member(guild_id, users[i].getUserID(),
-            [&sem, &names, i](const dpp::confirmation_callback_t& event)
+            [&bot, &sem, guild_id, &users, &names, i](const dpp::confirmation_callback_t& event)
             {
-                if (event.is_error())
-                {
-                    names[i] = "UNKNOWN_USER";
-                }
-                else
-                {
-                    const dpp::guild_member& member =
-                        event.get<dpp::guild_member>();
-
-                    names[i] = getUserDisplayName(member);
-                }
-                sem.release();
+                guildMemberCallback(
+                    bot, event, guild_id, users[i].getUserID(), sem, names[i]);
             });
-        usleep(10);
+        usleep(50);
     }
 
     int aquired = 0;
