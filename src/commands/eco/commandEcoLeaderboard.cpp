@@ -11,14 +11,12 @@
 #include "GuildUser.hpp"
 #include "dppUtils.h"
 
-void commandEcoLeaderboard(dpp::cluster &bot, const dpp::slashcommand_t &event)
+std::vector<std::string> getNamesIndividually(
+    dpp::cluster& bot,
+    std::vector<GuildUser>& users,
+    dpp::snowflake guild_id)
 {
     std::counting_semaphore sem(10);
-
-    dpp::snowflake guild_id = event.command.guild_id;
-    dpp::snowflake caller_id = event.command.member.user_id;
-
-    std::vector<GuildUser> users = GuildUser::getRichestN(guild_id, 10);
 
     std::vector<std::string> names(users.size());
 
@@ -41,6 +39,7 @@ void commandEcoLeaderboard(dpp::cluster &bot, const dpp::slashcommand_t &event)
                 }
                 sem.release();
             });
+        usleep(10);
     }
 
     int aquired = 0;
@@ -49,6 +48,52 @@ void commandEcoLeaderboard(dpp::cluster &bot, const dpp::slashcommand_t &event)
         sem.acquire();
         aquired++;
     }
+
+    return names;
+}
+
+// TODO: implement this function so we can get all leaderboard users in 1 request
+// std::vector<std::string> getNamesTogether(
+//     dpp::cluster& bot,
+//     std::vector<GuildUser>& users,
+//     dpp::snowflake guild_id)
+// {
+//     std::vector<std::string> names(users.size());
+
+//     std::vector<dpp::snowflake> user_ids;
+
+//     for (auto& user : users)
+//     {
+//         user_ids.push_back(user.getUserID());
+//     }
+
+//     dpp::snowflake last_user_id;
+
+//     for (int num_found = 0; num_found < users.size();)
+//     {
+//         // I don't wanna do this right now :/
+//         bot.guild_get_members(guild_id, )
+//     }
+
+//     return names;
+// }
+
+void commandEcoLeaderboard(dpp::cluster &bot, const dpp::slashcommand_t &event)
+{
+    dpp::snowflake guild_id = event.command.guild_id;
+    dpp::snowflake caller_id = event.command.member.user_id;
+
+    std::mutex lock;
+    lock.lock();
+
+    event.thinking(false, [&lock](const dpp::confirmation_callback_t&)
+        {
+            lock.unlock();
+        });
+
+    std::vector<GuildUser> users = GuildUser::getRichestN(guild_id, 10);
+
+    std::vector<std::string> names = getNamesIndividually(bot, users, guild_id);
 
     bool foundCaller = false;
     std::ostringstream ossEmbed;
@@ -71,5 +116,6 @@ void commandEcoLeaderboard(dpp::cluster &bot, const dpp::slashcommand_t &event)
     embed.color = dpp::colors::red;
     embed.description = ossEmbed.str();
 
-    event.reply(embed);
+    lock.lock();
+    event.edit_original_response(embed);
 }
