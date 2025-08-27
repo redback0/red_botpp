@@ -2,17 +2,19 @@
 #include <algorithm>
 #include <dpp/dispatcher.h>
 #include <dpp/exception.h>
+#include <dpp/misc-enum.h>
 #include <dpp/snowflake.h>
 #include <exception>
 #include <semaphore>
 #include <sstream>
 #include <string>
 #include <vector>
+#include <map>
 #include <dpp/dpp.h>
 #include "GuildUser.hpp"
 #include "dppUtils.h"
 
-void guildMemberCallback(
+static void guildMemberCallback(
     dpp::cluster& bot,
     const dpp::confirmation_callback_t& event,
     dpp::snowflake guild_id,
@@ -22,6 +24,7 @@ void guildMemberCallback(
 {
     if (event.is_error())
     {
+        // I don't know how to fix this :)
         if (event.get_error().code == dpp::err_rate_limited)
         {
             bot.guild_get_member(guild_id, user_id,
@@ -45,7 +48,7 @@ void guildMemberCallback(
     sem.release();
 }
 
-std::vector<std::string> getNamesIndividually(
+static std::vector<std::string> getNamesIndividually(
     dpp::cluster& bot,
     std::vector<GuildUser>& users,
     dpp::snowflake guild_id)
@@ -76,31 +79,83 @@ std::vector<std::string> getNamesIndividually(
     return names;
 }
 
-// TODO: implement this function so we can get all leaderboard users in 1 request
-// std::vector<std::string> getNamesTogether(
-//     dpp::cluster& bot,
-//     std::vector<GuildUser>& users,
-//     dpp::snowflake guild_id)
-// {
-//     std::vector<std::string> names(users.size());
+static void guildMembersCallback(
+    dpp::cluster& bot,
+    const dpp::confirmation_callback_t& result,
+    dpp::snowflake& guild_id,
+    std::map<dpp::snowflake, std::string>& names,
+    std::binary_semaphore& sem)
+{
+    if (result.is_error())
+    {
+        // :(
+    }
+    else
+    {
+        const dpp::guild_member_map& members =
+            result.get<dpp::guild_member_map>();
 
-//     std::vector<dpp::snowflake> user_ids;
+        for (auto& name: names)
+        {
+            if (members.contains(name.first))
+            {
+                name.second = getUserDisplayName(members.at(name.first));
+            }
+            else
+            {
+                // THIS WILL BE REMOVED WHEN RECURSION IS ADDED
+                bot.log(dpp::ll_warning, "eco leaderboard: name not found");
+                name.second = "MEMBER_NOT_FOUND";
+            }
+        }
 
-//     for (auto& user : users)
-//     {
-//         user_ids.push_back(user.getUserID());
-//     }
+        // int count = 0;
+        // for (auto& name: names)
+        // {
+        //     if (!name.second.empty())
+        //         count++;
+        // }
 
-//     dpp::snowflake last_user_id;
+        // // need this for servers bigger than 200, but I'm not worrying about
+        // // that right now
+        // if (count < names.size())
+        // {
+        //     bot.guild_get_members(guild_id, 200, last_user_id,
+        //         [&bot, &guild_id, &names](const dpp::confirmation_callback_t& conf)
+        //         {
+        //             guildMembersCallback(bot, conf, guild_id, names);
+        //         });
+        // }
+    }
+    sem.release();
+}
 
-//     for (int num_found = 0; num_found < users.size();)
-//     {
-//         // I don't wanna do this right now :/
-//         bot.guild_get_members(guild_id, )
-//     }
+std::map<dpp::snowflake, std::string> getNamesTogether(
+    dpp::cluster& bot,
+    std::vector<GuildUser>& users,
+    dpp::snowflake guild_id)
+{
+    std::binary_semaphore sem(1);
+    std::map<dpp::snowflake, std::string> names;
 
-//     return names;
-// }
+    dpp::snowflake last_user_id = 0;
+
+    for (auto& user : users)
+    {
+        names.insert(std::pair(user.getUserID(), ""s));
+    }
+
+    sem.acquire();
+    bot.guild_get_members(guild_id, 200, last_user_id,
+        [&bot, &guild_id, &names, &sem](const dpp::confirmation_callback_t& conf)
+        {
+            guildMembersCallback(bot, conf, guild_id, names, sem);
+        });
+
+    sem.acquire();
+
+    return names;
+}
 
 void commandEcoLeaderboard(dpp::cluster &bot, const dpp::slashcommand_t &event)
 {
@@ -117,7 +172,7 @@ void commandEcoLeaderboard(dpp::cluster &bot, const dpp::slashcommand_t &event)
 
     std::vector<GuildUser> users = GuildUser::getRichestN(guild_id, 10);
 
-    std::vector<std::string> names = getNamesIndividually(bot, users, guild_id);
+    auto names = getNamesTogether(bot, users, guild_id);
 
     bool foundCaller = false;
     std::ostringstream ossEmbed;
@@ -129,7 +184,7 @@ void commandEcoLeaderboard(dpp::cluster &bot, const dpp::slashcommand_t &event)
         if (i <= 10)
         {
             ossEmbed << '\n' << i << ". " << users[i].getNetWorth()
-                << ", " << names[i];
+                << ", " << names.at(users[i].getUserID());
         }
 
         // still need to confirm caller
