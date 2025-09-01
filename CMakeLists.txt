@@ -21,6 +21,7 @@ add_executable(${PROJECT_NAME}
     src/commands/eco/commandEcoDeposit.cpp
     src/commands/eco/commandEcoLeaderboard.cpp
     src/commands/commandJoin.cpp
+    src/commands/commandList.cpp
     src/commands/commandPlay.cpp
     src/commands/commandLeave.cpp
 )
