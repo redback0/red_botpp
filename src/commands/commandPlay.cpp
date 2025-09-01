@@ -1,4 +1,5 @@
 
+#include <filesystem>
 #include <string>
 #include <vector>
 #include <dpp/dpp.h>
@@ -18,6 +19,12 @@ void commandPlay(dpp::cluster& bot, const dpp::slashcommand_t& event)
 
     std::string sound_name =
         std::get<std::string>(event.get_parameter("sound"));
+
+    if (!std::filesystem::exists("audio/" + sound_name + ".mp3"))
+    {
+        event.reply("No such file");
+        return;
+    }
 
     std::vector<uint8_t> pcmdata =
         getDecodedAudio("audio/" + sound_name + ".mp3");

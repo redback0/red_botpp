@@ -12,6 +12,8 @@ std::map<std::string, Command> g_command;
 
 void registerCommands(dpp::cluster& bot)
 {
+    using namespace std::literals;
+
     INIT_COMMAND_LIST;
     ADD_COMMAND("ping", "Ping pong!", commandPing,);
     ADD_COMMAND("test", "This is a test", commandTest,);
@@ -79,20 +81,25 @@ void registerCommands(dpp::cluster& bot)
         )
     );
     ADD_COMMAND("join", "Join voice call", commandJoin,);
-    dpp::command_option sound_option(
-        dpp::command_option_type::co_string,
-        "sound", "The sound to play", true
-    );
-    for (auto& ai: std::filesystem::directory_iterator("./audio"))
-    {
-        std::cout << "Found audio file: " << ai << std::endl;
-        std::string s = ai.path().stem();
-        sound_option.add_choice(dpp::command_option_choice(s, s));
-    }
-    // todo: make this reloadable
+    ADD_COMMAND("list", "List available sounds", commandList,);
+
+    // this stops working past 25 files
+    // dpp::command_option sound_option(
+    //     dpp::command_option_type::co_string,
+    //     "sound", "The sound to play", true
+    // );
+    // for (auto& ai: std::filesystem::directory_iterator("./audio"))
+    // {
+    //     bot.log(dpp::ll_info, "Found audio file: "s + ai.path().string());
+    //     std::string s = ai.path().stem();
+    //     sound_option.add_choice(dpp::command_option_choice(s, s));
+    // }
     ADD_COMMAND("play", "Play a sound in the voice call", commandPlay,
         .add_option(
-            sound_option
+            dpp::command_option(
+                dpp::command_option_type::co_string,
+                "sound", "The sound to play", true
+            )
         )
     );
     ADD_COMMAND("leave", "Leave current voice call", commandLeave,);
