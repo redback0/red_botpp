@@ -9,6 +9,12 @@
     _commands.push_back( \
         dpp::slashcommand(( name ), ( description ), bot.me.id) params \
     )
+#define ADD_OPTION(type, name, description, required, params) \
+    .add_option( \
+        dpp::command_option( \
+            ( type ), ( name ), ( description ), ( required ) \
+        ) params \
+    )
 #define REGISTER_COMMANDS bot.global_bulk_command_create(_commands);
 
 typedef void (*command_func_ptr)(dpp::cluster&, const dpp::slashcommand_t&);

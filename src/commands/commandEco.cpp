@@ -9,6 +9,7 @@ static const std::map<std::string, EcoCommand> ecoCommands = {
     {"balance", commandEcoBalance},
     {"steal", commandEcoSteal},
     {"deposit", commandEcoDeposit},
+    {"withdraw", commandEcoWithdraw},
     {"leaderboard", commandEcoLeaderboard}
 };
 
