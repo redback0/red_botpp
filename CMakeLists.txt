@@ -19,6 +19,7 @@ add_executable(${PROJECT_NAME}
     src/commands/eco/commandEcoBalance.cpp
     src/commands/eco/commandEcoSteal.cpp
     src/commands/eco/commandEcoDeposit.cpp
+    src/commands/eco/commandEcoWithdraw.cpp
     src/commands/eco/commandEcoLeaderboard.cpp
     src/commands/commandJoin.cpp
     src/commands/commandList.cpp

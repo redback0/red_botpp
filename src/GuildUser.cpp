@@ -360,6 +360,21 @@ GuildUser::DepositResult GuildUser::doDeposit(long& amount)
     return DEP_SUCCESS;
 }
 
+GuildUser::WithdrawResult GuildUser::doWithdraw(long& amount)
+{
+    if (amount > 0)
+    {
+        if (amount > _bank)
+            return WITH_BANK_EMPTY;
+    }
+    else
+        return WITH_INVALID;
+
+    _wallet += amount;
+    _bank -= amount;
+    return WITH_SUCCESS;
+}
+
 void GuildUser::saveChanges()
 {
     int err;

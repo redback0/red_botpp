@@ -77,6 +77,14 @@ public:
         DEP_ERROR
     };
 
+    enum WithdrawResult
+    {
+        WITH_SUCCESS,
+        WITH_BANK_EMPTY,
+        WITH_INVALID,
+        WITH_ERROR
+    };
+
     enum StealResult
     {
         STEAL_SUCCESS,
@@ -114,6 +122,7 @@ public:
     bool doDaily();
     StealResult doSteal(GuildUser& victim);
     DepositResult doDeposit(long& amount);
+    WithdrawResult doWithdraw(long& amount);
 
     void saveChanges();
 };

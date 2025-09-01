@@ -18,66 +18,45 @@ void registerCommands(dpp::cluster& bot)
     ADD_COMMAND("ping", "Ping pong!", commandPing,);
     ADD_COMMAND("test", "This is a test", commandTest,);
     ADD_COMMAND("repeat", "Repeat a message", commandRepeat,
-        .add_option(
-            dpp::command_option(
-                dpp::command_option_type::co_string,
-                "text", "String to repeat", true
-            )
+        ADD_OPTION(dpp::command_option_type::co_string,
+            "text", "String to repeat", true,
         )
     );
     ADD_COMMAND("cringe", "How cringe is this", commandCringe,
-        .add_option(
-            dpp::command_option(
-                dpp::command_option_type::co_string,
-                "text", "😬", false
-            )
+        ADD_OPTION(dpp::command_option_type::co_string,
+            "text", "😬", false,
         )
     );
     ADD_COMMAND("eco", "A set of economy commands", commandEco,
-        .add_option(
-            dpp::command_option(
-                dpp::command_option_type::co_sub_command,
-                "daily", "Free points, daily", false
+        ADD_OPTION(dpp::command_option_type::co_sub_command,
+            "daily", "Free points, daily", false,
+        )
+        ADD_OPTION(dpp::command_option_type::co_sub_command,
+            "balance", "Check your account balance", false,
+            ADD_OPTION(dpp::command_option_type::co_user,
+                "user", "User who's balance to check", false,
             )
         )
-        .add_option(
-            dpp::command_option(
-                dpp::command_option_type::co_sub_command,
-                "balance", "Check your account balance", false
-            ).add_option(
-                dpp::command_option(
-                    dpp::command_option_type::co_user,
-                    "user", "User who's balance to check", false
-                )
+        ADD_OPTION(dpp::command_option_type::co_sub_command,
+            "steal", "Steal from another user", false,
+            ADD_OPTION(dpp::command_option_type::co_user,
+                "victim", "The user to steal from", true,
             )
         )
-        .add_option(
-            dpp::command_option(
-                dpp::command_option_type::co_sub_command,
-                "steal", "Steal from another user", false
-            ).add_option(
-                dpp::command_option(
-                    dpp::command_option_type::co_user,
-                    "victim", "The user to steal from", true
-                )
+        ADD_OPTION(dpp::command_option_type::co_sub_command,
+            "deposit", "Deposit from wallet to bank", false,
+            ADD_OPTION(dpp::command_option_type::co_integer,
+                "amount", "The amount to deposit. -1 for max", true,
             )
         )
-        .add_option(
-            dpp::command_option(
-                dpp::command_option_type::co_sub_command,
-                "deposit", "Deposit from wallet to bank", false
-            ).add_option(
-                dpp::command_option(
-                    dpp::command_option_type::co_integer,
-                    "amount", "The amount to deposit. -1 for max", true
-                )
+        ADD_OPTION(dpp::command_option_type::co_sub_command,
+            "withdraw", "Withdraw from the bank", false,
+            ADD_OPTION(dpp::command_option_type::co_integer,
+                "amount", "The amount to withdraw", true,
             )
         )
-        .add_option(
-            dpp::command_option(
-                dpp::command_option_type::co_sub_command,
-                "leaderboard", "See the leaderboard!", false
-            )
+        ADD_OPTION(dpp::command_option_type::co_sub_command,
+            "leaderboard", "See the leaderboard!", false,
         )
     );
     ADD_COMMAND("join", "Join voice call", commandJoin,);
@@ -95,11 +74,8 @@ void registerCommands(dpp::cluster& bot)
     //     sound_option.add_choice(dpp::command_option_choice(s, s));
     // }
     ADD_COMMAND("play", "Play a sound in the voice call", commandPlay,
-        .add_option(
-            dpp::command_option(
-                dpp::command_option_type::co_string,
-                "sound", "The sound to play", true
-            )
+        ADD_OPTION(dpp::command_option_type::co_string,
+            "sound", "The sound to play", true,
         )
     );
     ADD_COMMAND("leave", "Leave current voice call", commandLeave,);
