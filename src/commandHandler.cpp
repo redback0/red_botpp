@@ -17,6 +17,7 @@ void registerCommands(dpp::cluster& bot)
     INIT_COMMAND_LIST;
     ADD_COMMAND("ping", "Ping pong!", commandPing,);
     ADD_COMMAND("test", "This is a test", commandTest,);
+    SET_PREV_DEF_PERM(0);
     ADD_COMMAND("repeat", "Repeat a message", commandRepeat,
         ADD_OPTION(dpp::command_option_type::co_string,
             "text", "String to repeat", true,
@@ -27,6 +28,12 @@ void registerCommands(dpp::cluster& bot)
             "text", "😬", false,
         )
     );
+    ADD_COMMAND("editcringe", "sshshhh", commandEditCringe,
+        ADD_OPTION(dpp::command_option_type::co_integer,
+            "percent", "The new percent cringe", true,
+        )
+    );
+    SET_PREV_DEF_PERM(0);
     ADD_COMMAND("eco", "A set of economy commands", commandEco,
         ADD_OPTION(dpp::command_option_type::co_sub_command,
             "daily", "Free points, daily", false,

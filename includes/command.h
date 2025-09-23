@@ -15,6 +15,8 @@
             ( type ), ( name ), ( description ), ( required ) \
         ) params \
     )
+#define SET_PREV_DEF_PERM(perm) \
+    _commands.back().default_member_permissions = ( perm );
 #define REGISTER_COMMANDS bot.global_bulk_command_create(_commands);
 
 typedef void (*command_func_ptr)(dpp::cluster&, const dpp::slashcommand_t&);
@@ -36,6 +38,7 @@ void commandPing(dpp::cluster& bot, const dpp::slashcommand_t& event);
 void commandTest(dpp::cluster& bot, const dpp::slashcommand_t& event);
 void commandRepeat(dpp::cluster& bot, const dpp::slashcommand_t& event);
 void commandCringe(dpp::cluster& bot, const dpp::slashcommand_t& event);
+void commandEditCringe(dpp::cluster& bot, const dpp::slashcommand_t& event);
 void commandEco(dpp::cluster& bot, const dpp::slashcommand_t& event);
 void commandJoin(dpp::cluster& bot, const dpp::slashcommand_t& event);
 void commandPlay(dpp::cluster& bot, const dpp::slashcommand_t& event);
