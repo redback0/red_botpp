@@ -9,11 +9,12 @@
 
 void commandPlay(dpp::cluster& bot, const dpp::slashcommand_t& event)
 {
+    event.thinking();
     dpp::voiceconn* v = event.from()->get_voice(event.command.guild_id);
 
     if (!v || !v->voiceclient || !v->voiceclient->is_ready())
     {
-        event.reply("Make sure to do /join first");
+        event.edit_response("Make sure to do /join first");
         return;
     }
 
@@ -22,7 +23,7 @@ void commandPlay(dpp::cluster& bot, const dpp::slashcommand_t& event)
 
     if (!std::filesystem::exists("audio/" + sound_name + ".mp3"))
     {
-        event.reply("No such file");
+        event.edit_response("No such file");
         return;
     }
 
@@ -32,5 +33,5 @@ void commandPlay(dpp::cluster& bot, const dpp::slashcommand_t& event)
     v->voiceclient->send_audio_raw(
         (uint16_t*)pcmdata.data(), pcmdata.size());
 
-    event.reply("Successfully played audio");
+    event.edit_response("Successfully played audio");
 }
