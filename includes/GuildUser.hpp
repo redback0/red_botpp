@@ -123,6 +123,7 @@ public:
     StealResult doSteal(GuildUser& victim);
     DepositResult doDeposit(long& amount);
     WithdrawResult doWithdraw(long& amount);
+    void doGive(std::string account, long amount);
 
     void saveChanges();
 };

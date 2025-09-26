@@ -66,6 +66,23 @@ void registerCommands(dpp::cluster& bot)
             "leaderboard", "See the leaderboard!", false,
         )
     );
+    ADD_COMMAND("ecoadmin", "Admin commands for eco", commandEcoAdmin,
+        ADD_OPTION(dpp::command_option_type::co_sub_command,
+            "give", "Edit the amount of points a user has", false,
+            ADD_OPTION(dpp::command_option_type::co_user,
+                "user", "Which user to edit", true,
+            )
+            ADD_OPTION(dpp::command_option_type::co_string,
+                "account", "Change either wallet or bank", true,
+                .add_choice(dpp::command_option_choice("wallet", "wallet"))
+                .add_choice(dpp::command_option_choice("bank", "bank"))
+            )
+            ADD_OPTION(dpp::command_option_type::co_integer,
+                "amount", "The amount to add (negative to remove)", true,
+            )
+        )
+    );
+    SET_PREV_DEF_PERM(0);
     ADD_COMMAND("join", "Join voice call", commandJoin,);
     ADD_COMMAND("list", "List available sounds", commandList,);
 

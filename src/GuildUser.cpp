@@ -375,6 +375,16 @@ GuildUser::WithdrawResult GuildUser::doWithdraw(long& amount)
     return WITH_SUCCESS;
 }
 
+void GuildUser::doGive(std::string account, long amount)
+{
+    if (account == "wallet")
+        _wallet += amount;
+    else if (account == "bank")
+        _bank += amount;
+    else
+        throw std::runtime_error("Invalid account in GuildUser::doGive");
+}
+
 void GuildUser::saveChanges()
 {
     int err;
