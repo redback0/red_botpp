@@ -17,7 +17,7 @@ Commands from original red_bot
   [x] deposit
   [ ] inventory -- low priority
   [x] top -- rename to leaderboard
-  [ ] give -- mid priority -- needs permissions system
+  [x] give -- under new ecoadmin command
   [ ] withdraw
   [ ] shop -- low priority
   [ ] use -- low priority
